@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>Python for Evolutionary Genomics</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/black.css">
@@ -257,7 +257,7 @@
 					</section>
 					<section data-markdown>
 						<textarea data-template>
-							### Now we now…
+							### Now we know…
 							* How to search on NCBI
 							* How to download from NCBI
 							* How to store the downloaded sequences
@@ -366,18 +366,217 @@
 
 				</section>
 
-			<section data-markdown>
-				<textarea data-template>
-					## Useful Links
-					* [Anaconda](https://www.continuum.io/downloads) gives you Python + Biopyton + Jupyter (and many more packages)
-					* [Jupyter](http://jupyter.org/install.html) gives you the interactive Python notebooks in your browser
-					* [Biopython](biopython.org) comes with a ton of biology related functions
-					* [A short Python course](http://ruleofthirds.de/python-novice-inflammation/)
-					* [These slides are online](http://ruleofthirds.de/python-evol-genomics/)
-					* [As is the code presented here](https://github.com/gedankenstuecke/python-evol-genomics/blob/master/querying-ncbi.ipynb)
-				</textarea>
-			</section>
+				<section>
+					<section>
+						<h3>What else can we do with BioPython?</h3>
+					</section>
 
+					<section data-markdown>
+						<textarea data-template>
+							### Aligning coding sequences
+
+							```plain
+							>seqA
+							ATGGCAGGCTGCTGA
+							>seqB
+							ATGAGCTGA
+							```
+							What's the optimal alignment here?
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+							### Aligning coding sequences
+
+							```plain
+							>seqA
+							ATGGCAGGCTGCTGA
+							>seqB
+							ATG--AG-CTG---A
+							```
+							What's the optimal alignment here?
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+							### Aligning coding sequences
+							But what are the codons in seqB?
+							```plain
+							ATG
+							--A
+							G-C
+							TG-
+							--A
+							```
+							That's not really optimal…
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+							### Aligning coding sequences
+
+							```plain
+							>seqA
+							ATGGCAGGCTGCTGA
+							>seqB
+							ATG---AGC---TGA
+							```
+							This looks more biologically plausible
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+							### Aligning coding sequences
+							Often done by
+							* translating CDS to protein
+							* aligning proteins
+							* using the protein-alignment as blueprint
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+							### Aligning protein sequences
+
+							```plain
+							>seqA
+							MAGC*
+							>seqB
+							M-S-*
+							```
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+							### doing the coding sequence alignment
+
+							```python
+							from Bio import SeqIO
+
+							# read amino acid sequences
+							aa_handle = SeqIO.parse("aligned_aa.fasta","fasta")
+							aligned_aa = SeqIO.to_dict(aa_handle)
+
+							# read coding sequences
+							cds_handle = SeqIO.parse("unaligned_cds.fasta","fasta")
+							unaligned_cds = SeqIO.to_dict(cds_handle)
+
+							aligned_cds = {}
+
+							for seq_name in aligned_aa:
+							    prot_sequence = aligned_aa[seq_name].seq
+							    unaligned_cds_seq = unaligned_cds[seq_name].seq
+							    single_aligned_cds = ""
+							    current_position = 0
+							    for letter in prot_sequence:
+							        if letter == "-":
+							            single_aligned_cds += "---"
+							        else:
+							            codon = unaligned_cds_seq[current_position:current_position+3]
+							            if codon.translate() == letter:
+							                single_aligned_cds += codon
+							                current_position += 3
+							            else:
+							                break
+							    aligned_cds[seq_name] = single_aligned_cds
+
+							for seq_id in aligned_cds:
+							    print ">" + seq_id
+							    print aligned_cds[seq_id]
+
+							>seqB
+							ATG---AGC---TGA
+							>seqA
+							ATGGCAGGCTGCTGA
+							```
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+							### Some useful sequence functions
+
+							```python
+							from Bio.Seq import Seq
+
+							myseq = Seq("GATCGATGGGCCTATATAGGATCGAAAATCGC")
+
+							print myseq
+							print myseq.complement()
+							print myseq.reverse_complement()
+
+							ATGGCAGGCTGCTGA
+							TACCGTCCGACGACT
+							TCAGCAGCCTGCCAT
+
+							```
+						</textarea>
+					</section>
+				</section>
+
+				<section>
+					<section data-markdown>
+						<textarea data-template>
+							### [Jupyter](jupyter.org/install.html): Writing interactive Python
+							* write code in your browser
+							* run it interactively
+							* easily share your code
+
+
+						</textarea>
+					</section>
+
+					<section data-background-video="assets/jupyter.mov">
+						<h3><font color="black">Jupyter Notebooks</font></h3>
+					</section>
+
+					<section data-background-video="assets/jupyter2.mov">
+					</section>
+
+					<section data-background="assets/jupyter-export.png">
+						<p><font color="black">Allows for Rich Text comments</font></p>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							### [Jupyter](jupyter.org/install.html):
+							* runs on all platforms (Win, Mac, Linux)
+							* [export to pretty HTML pages](http://ruleofthirds.de/python-novice-inflammation/)
+							* (renders [e.g. on GitHub](https://github.com/gedankenstuecke/python-evol-genomics/blob/master/querying-ncbi.ipynb))
+						</textarea>
+					</section>
+				</section>
+
+
+
+
+
+
+
+				<section data-markdown>
+					<textarea data-template>
+						## Useful Links
+						* [These slides are online](http://ruleofthirds.de/python-evol-genomics/) (http://ruleofthirds.de/python-evol-genomics/)
+						* [As is the code presented in them](https://github.com/gedankenstuecke/python-evol-genomics/blob/master/querying-ncbi.ipynb)
+						* [Anaconda](https://www.continuum.io/downloads) gives you Python + Biopyton + Jupyter (and many more packages)
+						* [Jupyter](http://jupyter.org/install.html) gives you the interactive Python notebooks in your browser
+						* [Biopython](biopython.org) comes with a ton of biology related functions
+						* [A short Python course](http://ruleofthirds.de/python-novice-inflammation/)
+
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Get in touch
+						* bgreshake@googlemail.com
+
+					</textarea>
+				</section>
 
 
 			</div>
