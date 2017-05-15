@@ -1,0 +1,267 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h1>Python for Evolutionary Genomics</h1>
+					<h6>2017-05-17</h6>
+					<h5>Bastian Greshake</h5>
+				</section>
+
+				<section>
+				<h2>Some Background</h2>
+					<section data-background="assets/dissection.jpg">
+						<p><font color="black">BSc in Life Sciences</font></p>
+					</section>
+					<section data-background="assets/chironomus.jpg">
+						<p>MSc in Ecology/Evolution</p>
+					</section>
+					<section data-background="assets/cladonia.jpg">
+						<p>Now: PhD student in Applied Bioinformatics</p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Methodology</h2>
+					</section>
+					<section data-transition="fade">
+						<img src="assets/sequencing/sequencing.001.jpeg" / height=500/>
+					</section>
+					<section data-transition="fade">
+						<img src="assets/sequencing/sequencing.002.jpeg" / height=500/>
+					</section>
+					<section data-transition="fade">
+						<img src="assets/sequencing/sequencing.003.jpeg" / height=500/>
+					</section>
+					<section data-transition="fade">
+						<img src="assets/sequencing/sequencing.004.jpeg" / height=500/>
+					</section data-transition="fade">
+					<section>
+						<h2>Instead of 4 fragments: ~300,000,000 to sequence the human genome.
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>And now?</h2>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+					### What we've got:
+					```plain
+					>lasallia_pustulata mat1
+					CAAGAAGAACAATCGCTGGACGGAGGGGCTAATCAGTGCGGCCAAGGCAGTCGCGTCCTCGACCAACACG
+					CTGATTGAGACTGCCGATGGGGTCATCAGTGGGAGGAACAGTCCGGAGCAGTTGATCGTAGCCAGCAACG
+					ATGTGACTGCATCGACGGCCCAGCTAGTTGCTGCGAGCAGGGTCAAAGCCAATTTCGGGAGTCGGACCCA
+					AGATCGGCTCGAGGAAGCGAGCAAGGCTGTTGGCAAAGCTTGCAGGAGCCTTGTGCGCCAAGTCCAGGAC
+					ATCATCGCGCAGAAGAACCGCGACGAAGGAGAGGAGGTGGACTATGGCAAGCTCAGTGGGCACGAGTTCA
+					AAGTCCGAGAGATGGAGCAACAGGTGAGTGACGGATGCGCTCTTGAGACGTGGCTGGTGTGTGTACTAAT
+					…
+					```
+						</textarea>
+					</section>
+					<section>
+						<h3>What we want</h3>
+						Comparative Genomics
+					</section>
+					<section>
+						<h3>Comparative Genomics</h3>
+						<img src="assets/tree.jpg" height=500/>
+					</section>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+				## Getting Reference Data
+				```plain
+				Cladonia grayi
+				Umbilicaria muehlenbergii
+				Xanthoria parietina
+				Usnea florida
+				Arthroderma benhamiae
+				Microsporum canis
+				Massarina eburnea
+				Zasmidium cellare
+				```
+				plus search term, e.g. `mat1`
+					</textarea>
+				</section>
+
+				<section>
+					<section data-background="assets/ncbi1.png">
+						<h2><font color="black">Using <i>NCBI</i></font></h2>
+						<p><font color="black">NCBI Nucleotide database</font></p>
+					</section>
+					<section data-background="assets/ncbi2.png">
+						<p><font color="black">Search for a given taxa</font></p>
+					</section>
+					<section data-background="assets/ncbi3.png">
+						<p><font color="black">Search for a taxonomic range</font></p>
+					</section>
+					<section>
+						Nothing you want to do for ~200+ taxa manually!
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Enter Biopython</h2>
+						<img src="assets/biopython.png"/ height=250>
+						<p>Let's automate those sequence downloads</p>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							```python
+							# load package to query data from NCBI
+							from Bio import Entrez
+							# required information: email, in case of abuse
+							Entrez.email = "bgreshake@gmail.com"
+							```
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							```python
+							# load package to query data from NCBI
+							from Bio import Entrez
+							# required information: email, in case of abuse
+							Entrez.email = "bgreshake@gmail.com"
+
+							# search in the NCBI nucleotide DB
+							# for our earlier search term
+							search = Entrez.esearch(db="nucleotide",
+										term="mat1 AND Lecanoromycetes[Organism]")
+
+							# read in the results delivered by NCBI
+							search_results = Entrez.read(search)
+							print search_results
+							```
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+							```python
+							# read in the results delivered by NCBI
+							search_results = Entrez.read(search)
+							print search_results
+
+							{u'Count': '8', u'RetMax': '8', u'IdList': ['1179909122',
+							'49035742', '820940909', '820940907', '443908653',
+							'443908652', '70671408', '70671404'], … }
+
+							# and there's our list of sequence identifiers
+							print search_results["IdList"]
+							['1179909122', '49035742', '820940909',
+							'820940907', '443908653', '443908652',
+							'70671408', '70671404']
+
+							```
+						</textarea>
+					</section>
+					<section>
+						<h2>How can we get these sequences?</h2>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+							```python
+							# get single identifier
+							single_id = search_results["IdList"][1]
+
+							# download sequence as Genbank text
+							# from NCBI
+							single_record = Entrez.efetch(db="nucleotide", # which DB?
+							                            id=single_id, # which ID
+							                            rettype="gb", # which format
+							                            retmode="text") # text or XML?
+							```
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+							```python
+							single_record = Entrez.efetch(db="nucleotide", # which DB?
+							                            id=single_id, # which ID
+							                            rettype="gb", # which format
+							                            retmode="text") # text or XML?
+							sequence_file = single_record.read()
+							print sequence_file
+							```
+						</textarea>
+					</section>
+
+					<section>
+						<img src="assets/entrez-result.png"/>
+					</section>
+
+				</section>
+				<section>
+					And we can even get access to the sequence itself easily!
+				</section>
+
+				<section>
+					<section data-markdown>
+						<textarea data-template>
+							```python
+							from Bio import Entrez, SeqIO
+							single_record = Entrez.efetch(db="nucleotide", # which DB?
+							                            id=single_id, # which ID
+							                            rettype="gb", # which format
+							                            retmode="text") # text or XML?
+
+							sequence_object = SeqIO.read(single_record, "genbank")
+							```
+						</textarea>
+					</section>
+
+				</section>
+
+
+
+
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
