@@ -221,26 +221,124 @@
 
 				</section>
 				<section>
-					And we can even get access to the sequence itself easily!
-				</section>
+					<section>
+						And we can even get access to the sequence itself easily!
+					</section>
 
+					<section data-markdown>
+						<textarea data-template>
+								```python
+								# this loads the sequence object library
+								# which provides ways to work with sequences
+								from Bio import SeqIO
+
+								single_record = Entrez.efetch(db="nucleotide", # which DB?
+								                            id=single_id, # which ID
+								                            rettype="gb", # which format
+								                            retmode="text") # text or XML?
+
+								# this converts our results in a sequence object!
+								sequence_object = SeqIO.read(single_record, "genbank")
+
+								# we can easily save this as GenBank or FASTA
+								SeqIO.write(sequence_object,"my_result.fasta","fasta")
+								SeqIO.write(sequence_object,"my_result.genbank","genbank")
+								```
+					</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							### Now we now…
+							* How to search on NCBI
+							* How to download from NCBI
+							* How to store the downloaded sequences
+						</textarea>
+					</section>
+					<section>
+						<h3>Now we can automate the whole procedure for more than 1 taxon!</h3>
+					</section>
+				</section>
 				<section>
 					<section data-markdown>
 						<textarea data-template>
-							```python
-							from Bio import Entrez, SeqIO
-							single_record = Entrez.efetch(db="nucleotide", # which DB?
-							                            id=single_id, # which ID
-							                            rettype="gb", # which format
-							                            retmode="text") # text or XML?
+					## Thinking about our list of taxa of interest
+					```plain
+					Cladonia grayi
+					Umbilicaria muehlenbergii
+					Xanthoria parietina
+					Usnea florida
+					Arthroderma benhamiae
+					Microsporum canis
+					Massarina eburnea
+					Zasmidium cellare
+					```
+					e.g. saved in `taxon_list.txt`
+					</textarea>
+					</section>
 
-							sequence_object = SeqIO.read(single_record, "genbank")
-							```
+					<section data-markdown>
+						<textarea data-template>
+
+					```python
+					with open('taxon_list.txt') as infile:
+							for line in infile:
+									print line.strip()
+
+					Cladonia grayi
+					Umbilicaria muehlenbergii
+					Xanthoria parietina
+					Usnea florida
+					…
+					```
 						</textarea>
 					</section>
 
-				</section>
+					<section data-markdown>
+						<textarea data-template>
 
+					```python
+					all_results = []
+					with open('taxon_list.txt') as infile:
+					    for line in infile:
+					        search_term = line.strip() + "[Organism] AND mat1"
+					        search = Entrez.esearch(db="nucleotide",
+					                term=search_term)
+
+					        search_results = Entrez.read(search)
+					        all_results = all_results + search_results["IdList"]
+					print all_results
+
+					['1043332923', '932857407', '932857405',
+					'932857403', '932857401', '932857396',
+					'302505305', '307752092', '291177928']
+					```
+						</textarea>
+					</section>
+
+					<section>
+						<h3>This gives us the whole list of sequence identifier we wanted.
+							Now we only have to save them!</h3>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+
+					```python
+					all_sequences = []
+					for single_id in all_results:
+					    single_record = Entrez.efetch(db="nucleotide",
+					        id=single_id, rettype="gb",retmode="text")
+
+					    sequence_object = SeqIO.read(single_record, "genbank")
+					    all_sequences = all_sequences + sequence_object
+
+					print all_sequences
+					```
+						</textarea>
+					</section>
+
+
+				</section>
 
 
 
