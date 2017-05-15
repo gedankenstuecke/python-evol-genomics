@@ -128,7 +128,7 @@
 
 				<section>
 					<section>
-						<h2>Enter Biopython</h2>
+						<h2>Enter <a href="http://biopython.org/">Biopython</a></h2>
 						<img src="assets/biopython.png"/ height=250>
 						<p>Let's automate those sequence downloads</p>
 					</section>
@@ -140,10 +140,14 @@
 							# required information: email, in case of abuse
 							Entrez.email = "bgreshake@gmail.com"
 							```
+
+							[*Entrez*](https://www.ncbi.nlm.nih.gov/Class/MLACourse/Original8Hour/Entrez/) is the name of the programming interface to NCBI.
 						</textarea>
 					</section>
 					<section data-markdown>
 						<textarea data-template>
+							Let's search for a given gene for a given taxonomic range.
+
 							```python
 							# load package to query data from NCBI
 							from Bio import Entrez
@@ -164,6 +168,8 @@
 
 					<section data-markdown>
 						<textarea data-template>
+							This is what our results look like. Of interest for us:
+							The `IdList` key in the `search_results`:
 							```python
 							# read in the results delivered by NCBI
 							search_results = Entrez.read(search)
@@ -188,6 +194,7 @@
 
 					<section data-markdown>
 						<textarea data-template>
+							Let's start by getting a single identifier:
 							```python
 							# get single identifier
 							single_id = search_results["IdList"][1]
@@ -204,6 +211,7 @@
 
 					<section data-markdown>
 						<textarea data-template>
+							Now we download the text record:
 							```python
 							single_record = Entrez.efetch(db="nucleotide", # which DB?
 							                            id=single_id, # which ID
@@ -227,6 +235,7 @@
 
 					<section data-markdown>
 						<textarea data-template>
+								Seq.IO allows for easily reading/writing sequences
 								```python
 								# this loads the sequence object library
 								# which provides ways to work with sequences
@@ -338,14 +347,26 @@
 					</section>
 
 					<section>
+						<img src="assets/ncbi-fetch.png"/ height=500>
+					</section>
+
+					<section>
 						<h3>And that's literally all we have to do for automating this task</h3>
+						<p><a href="https://github.com/gedankenstuecke/EntrezFetchr/blob/master/scripts/EntrezFetchr.py">(A more elaborate version can be found here.)</a></p>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						### Other use cases
+						* finding literature on PubMed
+						* resolving taxonomic names via NCBI Taxonomy
+						* see the [Biopython Tutorial](http://biopython.org/DIST/docs/tutorial/Tutorial.html) for more examples
+						</textarea>
 					</section>
 
 				</section>
 
-				<section>
-					<img src="assets/ncbi-fetch.png"/ height=500>
-				</section>
+
 
 
 			</div>
@@ -363,20 +384,8 @@
 					{ src: 'plugin/markdown/marked.js' },
 					{ src: 'plugin/markdown/markdown.js' },
 					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: '//cdn.socket.io/socket.io-1.3.5.js', async: true },
-					{ src: 'plugin/multiplex/master.js', async: true },
 					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
 				],
-
-
-					multiplex: {
-						// Example values. To generate your own, see the socket.io server instructions.
-						secret: 14948539323418303382, // Obtained from the socket.io server. Gives this (the master) control of the presentation
-						id: 'dd3a5ca151953cc7', // Obtained from socket.io server
-						url: 'https://reveal-js-multiplex-ccjbegmaii.now.sh' // Location of socket.io server
-					},
-
-
 			});
 		</script>
 	</body>
